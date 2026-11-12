@@ -1,0 +1,30 @@
+{
+  "name": "proton-launcher",
+  "version": "1.0.0",
+  "description": "Launcher for Proton desktop apps",
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "local.protonlauncher",
+    "productName": "Proton Hub",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "assets/**"
+    ],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "Proton-Launcher.exe"
+    }
+  }
+}

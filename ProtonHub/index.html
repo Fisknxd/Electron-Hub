@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+<title>Proton Hub</title>
+<style>
+:root{--bg:#0d0a1a;--text:#fff;--sub:#a99fd6;--stat:#a09bba;--pill:#3d3470;--card:#1d1833;--accent:#7a5cff;--dim:#8f89ad;--ab:.55}
+:root{--hh:72px}
+body.inapp{--hh:52px}
+:root[data-theme="light"]{--bg:#f3f0fb;--text:#1c1633;--sub:#6a6488;--stat:#6a6488;--pill:#c9c0ee;--card:#fff;--dim:#8a84a8;--ab:.3}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--text);background:var(--bg);overflow:hidden;user-select:none}
+#bg{position:fixed;inset:0;z-index:0}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:var(--ab);will-change:transform}
+.aurora i:nth-child(1){width:560px;height:560px;left:18%;top:8%;background:#4b2fd8;animation:d1 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:460px;height:460px;right:12%;top:30%;background:#b13fd0;animation:d2 27s ease-in-out infinite alternate;opacity:calc(var(--ab) * .6)}
+.aurora i:nth-child(3){width:520px;height:420px;left:34%;bottom:-8%;background:#1f8fe0;animation:d3 31s ease-in-out infinite alternate;opacity:calc(var(--ab) * .5)}
+@keyframes d1{to{transform:translate(160px,90px) scale(1.2)}}
+@keyframes d2{to{transform:translate(-200px,-70px) scale(.85)}}
+@keyframes d3{to{transform:translate(130px,-110px) scale(1.15)}}
+#spot{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(420px circle at var(--sx,50%) var(--sy,50%),rgba(160,130,255,.16),transparent 70%)}
+header{position:fixed;top:0;left:0;right:0;height:var(--hh);z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 24px;-webkit-app-region:drag}
+header *{-webkit-app-region:no-drag}
+.brand{display:flex;align-items:center;gap:13px;-webkit-app-region:drag}
+.wm{height:27px;display:block;filter:drop-shadow(0 0 12px rgba(150,120,255,.55));animation:in .9s both}
+:root[data-theme="light"] .wm{filter:invert(1)}
+.hub{font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--sub);border:1px solid var(--pill);border-radius:6px;padding:4px 8px;position:relative;overflow:hidden;animation:in .9s .15s both}
+.hub::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(190,170,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:sheen 5s 1.5s infinite}
+@keyframes sheen{to{transform:translateX(120%)}}
+.right{display:flex;align-items:center}
+.dev{text-align:right;margin-right:16px;line-height:1.4}
+.dev b{display:block;font-size:12px;font-weight:700}
+.dev span{font-size:11px;color:var(--sub)}
+.ib{background:none;border:0;color:var(--text);width:36px;height:36px;display:grid;place-items:center;cursor:pointer;border-radius:8px;transition:background .15s,transform .2s}
+.ib:hover{background:rgba(255,255,255,.1)}
+#theme:hover{transform:rotate(180deg)}
+:root[data-theme="light"] .ib:hover{background:rgba(0,0,0,.07)}
+.ib.x:hover{background:#c42b1c;color:#fff}
+.wc{display:flex;margin-left:22px}
+main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:14px}
+h1{font-size:34px;font-weight:800;letter-spacing:-.8px;background:linear-gradient(100deg,#fff 20%,#c9b8ff 40%,#8fb4ff 50%,#c9b8ff 60%,#fff 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 6s linear infinite,in .8s .1s both}
+:root[data-theme="light"] h1{background-image:linear-gradient(100deg,#1c1633 20%,#6d4aff 50%,#1c1633 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text}
+@keyframes shim{to{background-position:-250% 0}}
+.tag{margin-top:14px;font-size:15px;color:var(--sub);animation:in .8s .25s both}
+.grid{margin-top:76px;display:grid;grid-template-columns:repeat(5,158px);row-gap:46px;justify-content:center}
+@keyframes in{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+.app{--c:#7a5cff;position:relative;display:flex;flex-direction:column;align-items:center;background:none;border:0;color:inherit;font:inherit;cursor:pointer;animation:in .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 65ms + 350ms);transition:opacity .25s,filter .25s}
+.tile{position:relative;width:74px;height:74px;border-radius:19px;overflow:hidden;transform:perspective(520px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)) scale(var(--sc,1));transition:transform .14s ease-out,box-shadow .25s;box-shadow:0 0 26px color-mix(in srgb,var(--c) 30%,transparent),0 0 0 1px rgba(255,255,255,.04)}
+.tile img{width:100%;height:100%;display:block}
+.tile::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.75),transparent 55%);opacity:0;mix-blend-mode:soft-light;transition:opacity .2s}
+.app:hover .tile,.app:focus-visible .tile{--ty:-7px;--sc:1.1;box-shadow:0 18px 55px color-mix(in srgb,var(--c) 75%,transparent),0 0 0 1px rgba(255,255,255,.15)}
+.app:hover .tile::after{opacity:1}
+.app:focus-visible{outline:none}
+.app:focus-visible .tile{outline:2px solid var(--c);outline-offset:4px}
+.app:active .tile{--sc:.95}
+.k{position:absolute;top:-8px;left:calc(50% - 46px);min-width:18px;height:18px;border-radius:9px;background:rgba(20,15,40,.85);border:1px solid var(--pill);font-size:10px;font-weight:700;display:grid;place-items:center;color:var(--sub);opacity:0;transform:scale(.6);transition:.2s;z-index:2}
+.app:hover .k{opacity:1;transform:none}
+.l{margin-top:13px;font-size:14px;font-weight:700;transition:letter-spacing .25s}
+.app:hover .l{letter-spacing:.4px}
+.s{margin-top:5px;font-size:11px;color:var(--stat);display:flex;align-items:center;gap:6px}
+.s::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dim);opacity:.6}
+.s.ok::before{background:#3ddc97;opacity:1;animation:pulse 2.2s infinite}
+.s.web{color:var(--sub)}
+.s.web::before{background:#9f8cff;opacity:.9}
+.s.no::before{background:transparent;border:1px solid var(--dim)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,220,151,.65)}70%,100%{box-shadow:0 0 0 7px rgba(61,220,151,0)}}
+.ring{position:absolute;top:0;left:50%;width:74px;height:74px;margin-left:-37px;border-radius:19px;border:2px solid var(--c);pointer-events:none;animation:ring .85s ease-out forwards}
+@keyframes ring{to{transform:scale(2.6);opacity:0}}
+.go .tile{animation:bounce .6s}
+@keyframes bounce{30%{transform:scale(1.25)}60%{transform:scale(.92)}100%{transform:none}}
+.dimmed{opacity:.18;filter:grayscale(1) blur(1px)}
+.hit .tile{outline:2px solid var(--c);outline-offset:5px}
+.auth{--c:#8a6bff;margin-top:40px;display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--sub);font:500 12.5px inherit;font-family:inherit;cursor:pointer;padding:5px 12px;border-radius:99px;animation:in .7s 1.2s both;transition:background .2s,color .2s,box-shadow .2s,opacity .25s}
+.auth:hover{background:rgba(140,110,255,.16);color:var(--text);box-shadow:0 0 24px rgba(140,110,255,.35)}
+.auth img{width:19px;height:19px;border-radius:5px;display:block}
+.settings{position:fixed;z-index:3;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;padding:9px 22px;border-radius:99px;border:1px solid var(--pill);background:rgba(20,15,40,.35);backdrop-filter:blur(8px);color:var(--text);font:500 13px inherit;font-family:inherit;cursor:pointer;transition:box-shadow .2s,border-color .2s;animation:in .8s 1.3s both}
+.settings svg{transition:transform .6s}
+.settings:hover{border-color:#8a6bff;box-shadow:0 0 26px rgba(122,92,255,.5)}
+.settings:hover svg{transform:rotate(120deg)}
+.foot{position:fixed;z-index:3;right:24px;bottom:18px;font-size:10px;color:var(--dim)}
+.tip{position:fixed;z-index:3;left:24px;bottom:18px;font-size:10px;color:var(--dim)}
+.tip b{border:1px solid var(--pill);border-radius:4px;padding:1px 5px;font-weight:600;margin:0 2px}
+#q{position:fixed;z-index:4;top:86px;left:50%;transform:translate(-50%,-14px);display:flex;align-items:center;gap:10px;padding:10px 20px;border-radius:99px;background:rgba(25,19,52,.85);border:1px solid #6d4aff;box-shadow:0 0 34px rgba(122,92,255,.5);font-size:15px;opacity:0;pointer-events:none;transition:.2s;color:#fff;backdrop-filter:blur(10px)}
+#q.on{opacity:1;transform:translate(-50%,0)}
+#q em{font-style:normal;color:#a99fd6;font-size:11px}
+#q i{width:2px;height:16px;background:#a99bff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.scrim{position:fixed;inset:0;z-index:5;background:rgba(8,6,16,.62);backdrop-filter:blur(6px);display:none;place-items:center}
+.scrim.on{display:grid}
+.modal{width:min(440px,88vw);background:var(--card);border:1px solid var(--pill);border-radius:18px;padding:28px;box-shadow:0 20px 80px rgba(100,70,255,.35);animation:in .3s both}
+.modal h2{font-size:19px;margin-bottom:10px}
+.modal p{font-size:14.5px;line-height:1.55;color:var(--sub)}
+.row{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.btn{padding:10px 18px;border-radius:10px;border:1px solid var(--pill);background:transparent;color:var(--text);font:500 14px inherit;font-family:inherit;cursor:pointer;transition:.15s}
+.btn:hover{border-color:#8a6bff}
+.btn.p{background:linear-gradient(135deg,#8a6bff,#5b3be0);border-color:transparent;color:#fff;box-shadow:0 6px 22px rgba(109,74,255,.45)}
+.toast{position:fixed;z-index:6;bottom:76px;left:50%;transform:translate(-50%,10px);background:var(--card);border:1px solid #6d4aff;box-shadow:0 0 28px rgba(122,92,255,.45);padding:10px 20px;border-radius:99px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.brand{-webkit-app-region:no-drag;cursor:pointer}
+body.inapp .wm{height:22px}
+#tabs{flex:1;display:none;align-items:center;gap:6px;margin:0 18px 0 26px;overflow:hidden}
+.tab{display:flex;align-items:center;gap:8px;height:34px;padding:0 6px 0 11px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid transparent;color:var(--sub);font:600 12.5px inherit;font-family:inherit;cursor:pointer;white-space:nowrap;animation:in .35s both;transition:background .15s,border-color .15s,color .15s}
+.tab:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.tab.on{background:rgba(122,92,255,.3);border-color:#7a5cff;color:#fff;box-shadow:0 0 22px rgba(122,92,255,.35)}
+.tab img{width:18px;height:18px;border-radius:5px;display:block}
+.tab .x{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;opacity:.55;margin-left:2px}
+.tab .x:hover{background:rgba(255,255,255,.2);opacity:1}
+.tab.home{padding-right:12px}
+#bar{position:absolute;left:0;bottom:0;height:2px;width:100%;opacity:0;background:linear-gradient(90deg,transparent,#8a6bff,#2fe0c8,transparent);background-size:40% 100%;background-repeat:no-repeat;transition:opacity .2s}
+#bar.loading{opacity:1;animation:load 1s linear infinite}
+@keyframes load{from{background-position:-40% 0}to{background-position:140% 0}}
+body.inapp .dev,body.inapp main,body.inapp .tip,body.inapp .foot,body.inapp .settings,body.inapp #q{display:none}
+body:not(.inapp) #reload{display:none}
+#native{display:none}
+body.hasnative #native{display:grid}
+@media (max-width:900px){.grid{grid-template-columns:repeat(3,130px)}}
+@media (max-height:700px){.grid{margin-top:40px;row-gap:22px}.auth{margin-top:22px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="aurora"><i></i><i></i><i></i></div>
+<div id="spot"></div>
+<header>
+  <div class="brand"><img class="wm" src="assets/wordmark.png" alt="Proton"><span class="hub">HUB</span></div>
+  <div id="tabs"></div>
+  <div class="right">
+    <div class="dev"><b>On this device</b><span id="count">Checking apps</span></div>
+    <button class="ib" id="native" title="Open the desktop app" aria-label="Open the desktop app"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+    <button class="ib" id="reload" title="Reload" aria-label="Reload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+    <button class="ib" id="theme" title="Switch theme" aria-label="Switch theme"><svg width="17" height="17" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+    <div class="wc">
+      <button class="ib" id="wmin" aria-label="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 5h8" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      <button class="ib" id="wmax" aria-label="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      <button class="ib x" id="wclose" aria-label="Close"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.2"/></svg></button>
+    </div>
+  </div>
+  <div id="bar"></div>
+</header>
+<main>
+  <h1>Welcome</h1>
+  <div class="tag">Privacy and security starts here</div>
+  <div class="grid" id="grid"></div>
+  <button class="auth" id="auth" data-app="authenticator"><img src="assets/authenticator.png" alt="">Authenticator</button>
+</main>
+<div id="q"><span id="qt"></span><i></i><em>Enter to open</em></div>
+<div class="tip">Press <b>1</b> to <b>0</b> to open, <b>Shift</b> click for the desktop app, or just type</div>
+<button class="settings" id="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+<div class="foot">Independent desktop launcher</div>
+<div class="scrim" id="scrim"><div class="modal"><h2 id="mt"></h2><p id="mp"></p><div class="row" id="mr"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DL={
+  mail:'https://proton.me/download/mail/windows/ProtonMail-desktop.exe',
+  pass:'https://proton.me/pass/download/windows',
+  vpn:'https://protonvpn.com/download',
+  drive:'https://proton.me/drive/download',
+  meet:'https://proton.me/download/meet/windows/ProtonMeet-desktop.exe',
+  auth:'https://proton.me/authenticator'
+};
+const RE=n=>new RegExp('^proton\\s?'+n+'$','i');
+const APPS=[
+ {id:'mail',n:'Mail',c:'#7c5cff',re:RE('mail'),dl:DL.mail,name:'Proton Mail'},
+ {id:'calendar',n:'Calendar',c:'#3d8bff',re:RE('mail'),dl:DL.mail,name:'Proton Mail',via:'Proton Calendar is included in the Proton Mail desktop app.'},
+ {id:'pass',n:'Pass',c:'#c07cff',re:RE('pass'),dl:DL.pass,name:'Proton Pass'},
+ {id:'vpn',n:'VPN',c:'#2fe0c8',re:RE('vpn'),dl:DL.vpn,name:'Proton VPN'},
+ {id:'lumo',n:'Lumo',c:'#6d4aff',web:'https://lumo.proton.me/',noApp:'Lumo has no Windows desktop app. It is available on the web, iOS and Android.'},
+ {id:'drive',n:'Drive',c:'#e060c0',re:RE('drive'),dl:DL.drive,name:'Proton Drive'},
+ {id:'docs',n:'Docs',c:'#4a9aff',web:'https://account.proton.me/drive',noApp:'Docs has no desktop app. It runs inside Proton Drive on the web.'},
+ {id:'sheets',n:'Sheets',c:'#2fcf74',web:'https://account.proton.me/drive',noApp:'Sheets has no desktop app. It runs inside Proton Drive on the web.'},
+ {id:'meet',n:'Meet',c:'#6a8bff',re:RE('meet'),dl:DL.meet,name:'Proton Meet'},
+ {id:'wallet',n:'Wallet',c:'#ff7a8a',web:'https://wallet.proton.me/',noApp:'Wallet has no Windows desktop app. It is available on the web, iOS and Android.'}
+];
+const EMBED={mail:'https://mail.proton.me/',calendar:'https://calendar.proton.me/',pass:'https://pass.proton.me/',lumo:'https://lumo.proton.me/',drive:'https://drive.proton.me/',docs:'https://docs.proton.me/',sheets:'https://docs.proton.me/',meet:'https://meet.proton.me/',wallet:'https://wallet.proton.me/',vpn:'https://account.protonvpn.com/',authenticator:'https://proton.me/authenticator'};
+const META={mail:'Mail',calendar:'Calendar',pass:'Pass',lumo:'Lumo',drive:'Drive',docs:'Docs',meet:'Meet',wallet:'Wallet',vpn:'VPN',authenticator:'Authenticator',account:'Settings'};
+const TABID={sheets:'docs'};
+let tabs=[],active=null;
+const loading={};
+const AUTH={id:'authenticator',n:'Authenticator',c:'#8a6bff',re:RE('authenticator'),dl:DL.auth,name:'Proton Authenticator'};
+const ALL=[...APPS,AUTH];
+const $=s=>document.querySelector(s);
+const scrim=$('#scrim');
+const btn={};
+let installed=[],query='',shown=0;
+const find=a=>installed.find(x=>a.re.test((x.Name||'').trim()));
+
+function modal(title,text,buttons){
+  $('#mt').textContent=title;$('#mp').textContent=text;
+  const r=$('#mr');r.innerHTML='';
+  buttons.forEach(b=>{const e=document.createElement('button');e.className='btn'+(b.p?' p':'');e.textContent=b.t;e.onclick=()=>{scrim.classList.remove('on');b.f&&b.f()};r.appendChild(e)});
+  scrim.classList.add('on');
+}
+scrim.addEventListener('click',e=>{if(e.target===scrim)scrim.classList.remove('on')});
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1900)}
+
+function status(a){
+  if(tabs.includes(TABID[a.id]||a.id)&&EMBED[a.id])return['Open now','ok'];
+  if(a.noApp)return['Web app','web'];
+  const hit=find(a);
+  if(a.id==='calendar')return hit?['Included in Mail','ok']:['Not installed','no'];
+  return hit?['Installed','ok']:['Not installed','no'];
+}
+function setCount(n){
+  const el=$('#count'),from=shown,t0=performance.now();shown=n;
+  (function f(t){const k=Math.min(1,(t-t0)/700),v=Math.round(from+(n-from)*(1-Math.pow(1-k,3)));
+    el.textContent=v+(v===1?' desktop app found':' desktop apps found');if(k<1)requestAnimationFrame(f)})(t0);
+}
+function render(){
+  document.querySelectorAll('.s').forEach(el=>{const a=APPS.find(x=>x.id===el.dataset.id);const[t,c]=status(a);el.textContent=t;el.className='s '+c});
+  setCount(['mail','pass','vpn','drive','meet'].filter(id=>find(APPS.find(x=>x.id===id))).length+(find(AUTH)?1:0));
+}
+async function refresh(){installed=await api.installed();render()}
+
+function launchFx(a){
+  const b=btn[a.id];if(!b||a.id==='authenticator')return;
+  const r=document.createElement('span');r.className='ring';b.appendChild(r);setTimeout(()=>r.remove(),900);
+  b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
+}
+async function open(a,native){
+  if(EMBED[a.id]&&!(native&&a.re)){
+    launchFx(a);setTimeout(()=>api.tabOpen(TABID[a.id]||a.id,EMBED[a.id]),260);return;
+  }
+  await refresh();
+  const hit=find(a);
+  if(hit){launchFx(a);api.launch(hit.AppID);toast('Launching '+a.name);return}
+  modal('Not downloaded',a.name+' is not downloaded on this PC.'+(a.via?' '+a.via:''),[{t:'Close'},{t:'Download '+a.name,p:1,f:()=>api.external(a.dl)}]);
+}
+
+const grid=$('#grid');
+APPS.forEach((a,i)=>{
+  const b=document.createElement('button');b.className='app';b.dataset.app=a.id;
+  b.style.setProperty('--c',a.c);b.style.setProperty('--i',i);
+  b.innerHTML=`<span class="k">${i===9?0:i+1}</span><div class="tile"><img src="assets/${a.id}.png" alt=""></div><span class="l">${a.n}</span><span class="s" data-id="${a.id}"></span>`;
+  b.onclick=e=>open(a,e.shiftKey);
+  b.addEventListener('mousemove',e=>{
+    const r=b.querySelector('.tile').getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    b.style.setProperty('--rx',((.5-y)*24).toFixed(1)+'deg');b.style.setProperty('--ry',((x-.5)*24).toFixed(1)+'deg');
+    b.style.setProperty('--mx',(x*100)+'%');b.style.setProperty('--my',(y*100)+'%');
+  });
+  b.addEventListener('mouseleave',()=>{b.style.setProperty('--rx','0deg');b.style.setProperty('--ry','0deg')});
+  grid.appendChild(b);btn[a.id]=b;
+});
+btn.authenticator=$('#auth');
+$('#auth').onclick=()=>open(AUTH);
+
+/* type to search, number keys to launch */
+function matches(){return query?ALL.filter(a=>a.n.toLowerCase().includes(query.toLowerCase())):[]}
+function filter(){
+  const m=matches();
+  $('#q').classList.toggle('on',!!query);
+  $('#qt').textContent=query;
+  ALL.forEach((a,i)=>{const b=btn[a.id];b.classList.toggle('dimmed',!!query&&!m.includes(a));b.classList.toggle('hit',!!m.length&&m[0]===a)});
+}
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(scrim.classList.contains('on'))scrim.classList.remove('on');else{query='';filter()}return}
+  if(scrim.classList.contains('on')||active||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='Enter'){const m=matches();if(m[0]){query='';filter();open(m[0])}return}
+  if(e.key==='Backspace'){query=query.slice(0,-1);filter();return}
+  if(/^[0-9]$/.test(e.key)&&!query){const a=APPS[e.key==='0'?9:+e.key-1];if(a)open(a);return}
+  if(e.key.length===1&&/[a-z0-9 ]/i.test(e.key)){query+=e.key;filter()}
+});
+
+$('#settings').onclick=()=>api.tabOpen('account','https://account.proton.me/mail');
+$('#theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='light'?'dark':'light'};
+$('#wmin').onclick=()=>api.min();$('#wmax').onclick=()=>api.max();$('#wclose').onclick=()=>api.close();
+
+/* embedded tabs */
+const HASICON=new Set(['mail','calendar','pass','vpn','lumo','drive','docs','meet','wallet','authenticator']);
+const NATIVE={mail:APPS[0],calendar:APPS[1],pass:APPS[2],vpn:APPS[3],drive:APPS[5],meet:APPS[8],authenticator:AUTH};
+function renderTabs(){
+  const el=$('#tabs');el.innerHTML='';
+  document.body.classList.toggle('inapp',!!active);
+  document.body.classList.toggle('hasnative',!!active&&!!NATIVE[active]);
+  $('#bar').classList.toggle('loading',!!active&&!!loading[active]);
+  if(!tabs.length){el.style.display='none';return}
+  el.style.display='flex';
+  const h=document.createElement('button');h.className='tab home'+(active?'':' on');
+  h.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Home';
+  h.onclick=()=>api.tabHome();el.appendChild(h);
+  tabs.forEach(id=>{
+    const t=document.createElement('button');t.className='tab'+(id===active?' on':'');
+    const ic=HASICON.has(id)?`<img src="assets/${id}.png" alt="">`:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>';
+    t.innerHTML=`${ic}<span>${META[id]||id}</span><span class="x" title="Close">&#10005;</span>`;
+    t.onclick=e=>{if(e.target.closest('.x'))api.tabClose(id);else api.tabShow(id)};
+    el.appendChild(t);
+  });
+}
+api.onTab(d=>{
+  if(d.type==='opened'&&!tabs.includes(d.id))tabs.push(d.id);
+  if(d.type==='closed')tabs=tabs.filter(x=>x!==d.id);
+  if(d.type==='active')active=d.id;
+  if(d.type==='loading')loading[d.id]=d.on;
+  renderTabs();render();
+});
+document.querySelector('.brand').onclick=()=>api.tabHome();
+$('#reload').onclick=()=>api.tabReload();
+$('#native').onclick=async()=>{const a=NATIVE[active];if(!a)return;await refresh();const hit=find(a);hit?api.launch(hit.AppID):api.external(a.dl)};
+render();refresh();addEventListener('focus',refresh);
+
+/* spotlight and particle field */
+const sp=$('#spot');
+const cv=$('#bg'),cx=cv.getContext('2d');
+let W,H,mx=-999,my=-999,P=[];
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;P=Array.from({length:Math.round(W*H/16000)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.5+.4,z:Math.random()*.8+.2}))}
+size();addEventListener('resize',size);
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;sp.style.setProperty('--sx',mx+'px');sp.style.setProperty('--sy',my+'px')});
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function tick(){
+  if(document.body.classList.contains('inapp')){if(!still)requestAnimationFrame(tick);return}
+  cx.clearRect(0,0,W,H);
+  const rgb=document.documentElement.dataset.theme==='light'?'90,60,210':'185,165,255';
+  for(const p of P){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);
+    if(d<130){p.x+=dx/d*(130-d)*.012;p.y+=dy/d*(130-d)*.012}
+    cx.fillStyle=`rgba(${rgb},${.25+p.z*.5})`;
+    cx.beginPath();cx.arc(p.x,p.y,p.r*p.z+.3,0,6.283);cx.fill();
+  }
+  for(let i=0;i<P.length;i++){
+    const a=P[i];
+    for(let j=i+1;j<P.length;j++){
+      const b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<95){cx.strokeStyle=`rgba(${rgb},${(1-d/95)*.16})`;cx.lineWidth=.7;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()}
+    }
+    const dm=Math.hypot(a.x-mx,a.y-my);
+    if(dm<170){cx.strokeStyle=`rgba(${rgb},${(1-dm/170)*.5})`;cx.lineWidth=.9;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(mx,my);cx.stroke()}
+  }
+  if(!still)requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
